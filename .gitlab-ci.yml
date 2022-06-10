@@ -1,0 +1,146 @@
+# import gitlab ci job templates
+include:
+  - project: 'initial/gitlab-ci-templates'
+    ref: dotnetcore
+    file: 'jobs/code-static-scan.yaml'
+  - project: 'initial/gitlab-ci-templates'
+    ref: dotnetcore
+    file: 'jobs/build.yaml'
+  - project: 'initial/gitlab-ci-templates'
+    ref: dotnetcore
+    file: 'jobs/push-docker-image.yaml'
+  - project: 'initial/gitlab-ci-templates'
+    ref: dotnetcore
+    file: 'jobs/deploy.yaml'
+  - project: 'initial/gitlab-ci-templates'
+    ref: dotnetcore
+    file: 'jobs/ingress-changes.yaml'
+  - project: 'initial/gitlab-ci-templates'
+    ref: dotnetcore
+    file: 'jobs/notify.yaml'
+  - project: 'initial/gitlab-ci-templates'
+    ref: dotnetcore
+    file: 'jobs/check-test-branch.yaml'
+
+
+# set global variables
+variables:
+  BUILD_FILE: "comm100Integration.Service/comm100Integration.Service/Comm100Integration.Service.csproj"
+  RUN_DLL: "Comm100Integration.Service.dll"
+  CI_PROJECT_NAME: "Comm100Integration"
+  PARTNER_DOMAIN: "voip.Vincall.net"
+
+  # db connection string at local dev envi
+  MAIN_DB_CONNECT_STRING: "Server=192.168.2.215,1433;User=sa;Password=Aa00000000;"
+  REPORTING_DB_CONNECT_STRING: "Server=192.168.2.215,1533;User=sa;Password=Aa00000000;"
+  CENTER_DB_CONNECT_STRING: "Server=192.168.2.215,1433;User=sa;Password=Aa00000000;database=${CI_COMMIT_REF_SLUG}.Comm100.Center"
+
+  # secretmanager name on test envi
+  SECRET_MANAGER: "autocoding-testing-database"
+  SECRET_MANAGER_FOR_REPORTING: "autocoding-testing-database-1533"
+  CENTER_DATABASE_TEST: "Server=10.200.1.193;User=sa;Password=Aa00000000;;database=${CI_COMMIT_REF_SLUG}.Comm100.Center"
+  
+  # do not change the following viariables
+  RELEASE_PATH: "release"           
+  IMAGE_REPOSITORY: "x2"
+  CONTAINER_IMAGE: ${CI_REGISTRY}/${IMAGE_REPOSITORY}/${CI_PROJECT_NAME}/${CI_COMMIT_REF_SLUG}:${CI_COMMIT_SHORT_SHA}
+  CONTAINER_IMAGE_LASTEST: ${CI_REGISTRY}/${IMAGE_REPOSITORY}/${CI_PROJECT_NAME}/${CI_COMMIT_REF_SLUG}
+  CONTAINER_IMAGE_TEST: ${ONLINE_REGISTRY}/${IMAGE_REPOSITORY}/${CI_PROJECT_NAME}/${CI_COMMIT_REF_SLUG}:${CI_COMMIT_SHORT_SHA}
+    
+
+# define jobs
+stages:
+  - code-static-scan
+  - build
+  - push-docker-image
+  - deploy
+  - ingress-changes
+  - notify
+  - check-test-branch
+
+
+# run jobs
+code-static-scan:
+  stage: code-static-scan
+  extends: .code-static-scan
+  interruptible: true
+  allow_failure: true
+  only:
+    - dev
+
+
+build:
+  stage: build
+  image:
+    name: harbor.comm100dev.io/comm100-internal/dotnet-core-sdk:3.1
+  extends: .build
+  interruptible: true
+  only:
+    - branches    
+    - tags
+  except:   
+    - /^feature.*$/
+
+push-docker-image:
+  stage: push-docker-image
+  extends: .push-docker-image
+  interruptible: true
+  dependencies:
+    - build
+  only:
+    - branches
+    - tags
+  except:    
+    - /^feature.*$/
+
+
+deploy:
+  stage: deploy
+  extends: .deploy
+  interruptible: true
+  dependencies:
+    - push-docker-image
+  only:
+    - branches
+    - tags
+  except:   
+    - /^feature.*$/
+
+ingress-changes:
+  stage: ingress-changes
+  extends: .ingress-changes
+  needs: []
+  dependencies:
+    - push-docker-image
+  only:
+    refs:
+      - branches
+    changes:
+      - ingress.yaml
+  except:   
+    - /^feature.*$/
+
+notify:
+  stage: notify
+  extends: .notify
+  interruptible: true
+  only:
+    - test
+    - tags
+  except:
+    - dev
+    - /^feature.*$/
+  when: on_failure
+
+check-test-branch:
+  stage: check-test-branch
+  extends: .check-test-branch
+  interruptible: true
+  needs: []
+  only:
+    - test
+  except:
+    - dev
+    - master
+    - /^test-.*$/
+    - /^feature.*$/
