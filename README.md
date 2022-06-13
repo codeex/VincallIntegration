@@ -1,11 +1,11 @@
 ### Introduction
-**Comm100Integration** is a backend project based on dotnetcore3.1. It builds the interfaces to connect vincall and Comm100, including vincall backend JwtSignIn service、vincall backend oauth2 callback service and agent mapping service.
+**VincallIntegration** is a backend project based on dotnetcore3.1. It builds the interfaces to connect vincall and Comm100, including vincall backend JwtSignIn service、vincall backend oauth2 callback service and agent mapping service.
 ### Initializing
 Clone vincall.portal repository on your computer, install dependencies using:
 ```
 git clone
 ```
-Then if you want to run the project, go to the directory comm100Integration.Service .
+Then if you want to run the project, go to the directory VincallIntegration.Service .
 ```
 dotnet run
 ```
