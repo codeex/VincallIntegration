@@ -27,7 +27,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.3.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.3.1" />
     <PackageReference Include="Twilio" Version="5.65.0" />
-    <PackageReference Include="WebApiClientCore" Version="100.1.6" />
+    <PackageReference Include="WebApiClientCore" Version="2.0.2" />
     <PackageReference Include="WebApiClientCore.Extensions.OAuths" Version="2.0.2" />
   </ItemGroup>
 
