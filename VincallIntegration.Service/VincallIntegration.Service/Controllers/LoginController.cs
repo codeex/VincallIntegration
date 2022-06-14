@@ -76,12 +76,6 @@ namespace VincallIntegration.Service.Controllers
         [HttpGet("login/comm100callback")]
         public async Task<IActionResult> Comm100callbackAsync([FromQuery]Comm100CallbackModel model)
         {
-            //var ifConnectionStateTrue = await CheckIfConnectionStateTrueAsync(Convert.ToInt32(model.SiteId));
-            //if (!ifConnectionStateTrue)
-            //{
-            //    _logger.LogError($"Connection State for siteId{model.SiteId} is true!");
-            //    return new BadRequestResult();
-            //}
             if (string.IsNullOrEmpty(model?.returnUri))
             {
                 _logger.LogError("returnUri is null");
