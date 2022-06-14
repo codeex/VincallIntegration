@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.25" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.25" />
+    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="3.1.25" />
+    <PackageReference Include="RestSharp" Version="107.3.0" />
+    <PackageReference Include="Twilio" Version="5.65.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VincallIntegration.Infrastructure\VincallIntegration.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>
